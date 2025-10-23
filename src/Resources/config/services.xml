@@ -6,6 +6,28 @@
 
     <services>
         <defaults autowire="true" autoconfigure="true"/>
-        <prototype namespace="SptecOrderComments\" resource="../../" exclude="../../{DependencyInjection,Resources,Migration,MbCore.php}" />
+        <prototype namespace="SptecOrderComments\" resource="../../" exclude="../../{DependencyInjection,Resources,Migration,SptecOrderComments.php}" />
+
+        <!-- Explicitly register entity extensions -->
+        <service id="SptecOrderComments\Extension\Checkout\Order\OrderComment\OrderCommentExtension">
+            <tag name="shopware.entity.extension"/>
+        </service>
+
+        <service id="SptecOrderComments\Extension\Content\Media\MediaExtension">
+            <tag name="shopware.entity.extension"/>
+        </service>
+
+        <service id="SptecOrderComments\Extension\System\User\UserExtension">
+            <tag name="shopware.entity.extension"/>
+        </service>
+
+        <!-- Explicitly register entity definitions -->
+        <service id="SptecOrderComments\Extension\Checkout\Order\OrderComment\OrderCommentDefinition">
+            <tag name="shopware.entity.definition"/>
+        </service>
+
+        <service id="SptecOrderComments\Extension\Checkout\Order\OrderComment\OrderCommentMediaDefinition">
+            <tag name="shopware.entity.definition"/>
+        </service>
     </services>
 </container>
