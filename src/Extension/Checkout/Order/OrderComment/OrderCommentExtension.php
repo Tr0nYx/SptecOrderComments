@@ -32,6 +32,6 @@ class OrderCommentExtension extends EntityExtension
 
     public function getEntityName(): string
     {
-        return OrderCommentDefinition::ENTITY_NAME;
+        return 'order';
     }
 }

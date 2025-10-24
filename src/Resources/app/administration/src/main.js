@@ -1,3 +1,4 @@
+import './app/entity/extension/order.extension';
 import './app/component/media/sw-media-folder-item';
 import './app/component/sptec-media-item';
 import './module/sw-order/page/sw-order-detail';
