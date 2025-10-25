@@ -11,6 +11,7 @@ Component.register('sptec-order-comments-modal', {
 
     inject: [
         'repositoryFactory',
+        'acl',
     ],
 
     props: {
@@ -29,6 +30,7 @@ Component.register('sptec-order-comments-modal', {
         return {
             isLoading: true,
             orderComment: undefined,
+            currentUser: null,
             mediaModalIsOpen: false,
             taskOptions: [
                 {
@@ -55,11 +57,13 @@ Component.register('sptec-order-comments-modal', {
         },
 
         primaryActionDisabled() {
-            return !this.orderComment || !this.orderComment.content || this.orderComment.content === '';
-        },
-
-        currentUser() {
-            return Shopware.State.get('session').currentUser;
+            const disabled = !this.orderComment || !this.orderComment.content || this.orderComment.content === '';
+            console.log('DEBUG primaryActionDisabled:', {
+                hasOrderComment: !!this.orderComment,
+                content: this.orderComment?.content,
+                disabled: disabled
+            });
+            return disabled;
         },
 
         userName() {
@@ -106,10 +110,24 @@ Component.register('sptec-order-comments-modal', {
     },
 
     created() {
-        this.createdComponent();
+        this.loadCurrentUser().then(() => {
+            this.createdComponent();
+        });
     },
 
     methods: {
+        loadCurrentUser() {
+            // In Shopware 6.7, use Shopware.Store instead of Shopware.State
+            const sessionStore = Shopware.Store.get('session');
+            if (sessionStore && sessionStore.currentUser) {
+                this.currentUser = sessionStore.currentUser;
+                return Promise.resolve();
+            }
+
+            console.error('Could not load current user from session store');
+            return Promise.resolve();
+        },
+
         createdComponent() {
             if (this.orderCommentId) {
                 this.getOrderComment();
@@ -117,11 +135,22 @@ Component.register('sptec-order-comments-modal', {
             }
 
             this.orderComment = this.orderCommentRepository.create(Shopware.Context.api);
-            this.orderComment.createdById = this.currentUser.id;
+            if (this.currentUser) {
+                this.orderComment.createdById = this.currentUser.id;
+            }
             this.orderComment.orderId = this.orderId;
+            this.orderComment.content = ''; // Initialize content explicitly
             this.orderComment.internal = true;
             this.orderComment.task = null;
             this.isLoading = false;
+
+            console.log('DEBUG createdComponent - orderComment:', this.orderComment);
+        },
+
+        onContentChange(value) {
+            console.log('DEBUG onContentChange called with:', value);
+            this.orderComment.content = value;
+            console.log('DEBUG orderComment.content is now:', this.orderComment.content);
         },
 
         closeModal() {
